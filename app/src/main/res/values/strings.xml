@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MultiBleApp</string>
+    <string name="hts_title">体温监测</string>
+    <string name="ropeskip_title">跳绳</string>
+    <string name="sport_title">腕力球</string>
+</resources>
