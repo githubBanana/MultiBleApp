@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelUuid;
@@ -30,7 +29,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.diy.blelib.R;
-import com.diy.blelib.bag.ByteUtil;
 
 import java.util.Set;
 import java.util.UUID;
@@ -41,7 +39,7 @@ import java.util.UUID;
  * @date: 2016-04-03 20:39
  */
 public class ScannerFragment extends DialogFragment{
-    private static final String TAG = "ScannerFragment";
+    public static final String TAG = "ScannerFragment";
 
     private final static String PARAM_UUID = "param_uuid";
     private final static String DISCOVERABLE_REQUIRED = "discoverable_required";

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.PullLoaderRecyclerView;
@@ -53,6 +52,5 @@ public class MainViewActivity extends AppCompatActivity implements BaseQuickAdap
         if (getString(R.string.hts_title).equals(item.text)) {
             HtsActivity.runAct(this,getString(R.string.hts_title));
         }
-        Toast.makeText(MainViewActivity.this,String.valueOf(i),Toast.LENGTH_SHORT).show();
     }
 }

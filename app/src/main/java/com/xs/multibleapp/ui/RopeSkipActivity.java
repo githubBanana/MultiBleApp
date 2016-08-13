@@ -33,9 +33,8 @@ public class RopeSkipActivity extends BleProfileServiceReadyActivity<RopeSkipSer
         // this may notify user or show some views
     }
 
-
     @Override
-    protected void setDefaultUI() {
+    protected void setUIConnectStatus(int status) {
 
     }
 

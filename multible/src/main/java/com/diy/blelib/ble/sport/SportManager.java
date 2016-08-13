@@ -24,11 +24,11 @@ import android.util.Log;
 import com.diy.blelib.bag.ActiveSend;
 import com.diy.blelib.bag.BagCommand;
 import com.diy.blelib.bag.BagHandler;
-import com.diy.blelib.exception.BleErrorInfo;
+import com.diy.blelib.profile.bleutils.exception.BleErrorInfo;
 import com.diy.blelib.profile.BleManager;
+import com.diy.blelib.profile.bleutils.BleUUID;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * HTSManager class performs BluetoothGatt operations for connection, service discovery, enabling indication and reading characteristics. All operations required to connect to device with BLE HT
@@ -39,17 +39,8 @@ public class SportManager implements BleManager<SportManagerCallbacks> {
 	private SportManagerCallbacks mCallbacks;
 	private BluetoothGatt mBluetoothGatt;
 	private Context mContext;
-	//心率服务
-	public final static UUID HR_SERVICE_UUID = UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb");
-	private static final UUID HR_SENSOR_LOCATION_CHARACTERISTIC_UUID = UUID.fromString("00002A38-0000-1000-8000-00805f9b34fb");
-	private static final UUID HR_MEASUREMENT_CHARACTERISTIC_UUID = UUID.fromString("00002A37-0000-1000-8000-00805f9b34fb");
-    private static final UUID CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
-    //电池服务
-	public final static UUID BATTERY_SERVICE = UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb");
-	private final static UUID BATTERY_LEVEL_CHARACTERISTIC = UUID.fromString("00002A19-0000-1000-8000-00805f9b34fb");
 
-	public static final UUID R_TX_CHAR_UUID = UUID.fromString("00000003-0000-1000-8000-00805f9b34fb");
 
 	private BluetoothGattCharacteristic  mBatteryCharacteritsic,mHrsCharacteristic,mHistoryCharacteristic;
 
@@ -149,9 +140,9 @@ public class SportManager implements BleManager<SportManagerCallbacks> {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				List<BluetoothGattService> services = gatt.getServices();
 				for (BluetoothGattService service : services) {
-					if (service.getUuid().equals(HR_SERVICE_UUID)) {
-                        mHrsCharacteristic = service.getCharacteristic(HR_MEASUREMENT_CHARACTERISTIC_UUID);
-						mHistoryCharacteristic = service.getCharacteristic(HR_SENSOR_LOCATION_CHARACTERISTIC_UUID);
+					if (service.getUuid().equals(BleUUID.HR_SERVICE_UUID)) {
+                        mHrsCharacteristic = service.getCharacteristic(BleUUID.HR_MEASUREMENT_CHARACTERISTIC_UUID);
+						mHistoryCharacteristic = service.getCharacteristic(BleUUID.HR_SENSOR_LOCATION_CHARACTERISTIC_UUID);
                     }
 				}
 
@@ -181,7 +172,7 @@ public class SportManager implements BleManager<SportManagerCallbacks> {
 		@Override
 		public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
-				if (characteristic.getUuid().equals(BATTERY_LEVEL_CHARACTERISTIC)) {
+				if (characteristic.getUuid().equals(BleUUID.BATTERY_LEVEL_CHARACTERISTIC)) {
 					int batteryValue = characteristic.getValue()[0];
 					mCallbacks.onBatteryValueReceived(batteryValue);
 				}
@@ -203,7 +194,7 @@ public class SportManager implements BleManager<SportManagerCallbacks> {
          */
 		@Override
 		public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-			if(characteristic.getUuid().equals(HR_MEASUREMENT_CHARACTERISTIC_UUID)) {
+			if(characteristic.getUuid().equals(BleUUID.HR_MEASUREMENT_CHARACTERISTIC_UUID)) {
 				if (syncInit) {
 					syncInit = false;
 					sendCommand(ActiveSend.toSyncTime());
@@ -267,7 +258,7 @@ public class SportManager implements BleManager<SportManagerCallbacks> {
 	private void enableHRNotification() {
 		Log.d(TAG, "Enabling heart rate notifications");
 		mBluetoothGatt.setCharacteristicNotification(mHrsCharacteristic, true);
-		BluetoothGattDescriptor descriptor = mHrsCharacteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
+		BluetoothGattDescriptor descriptor = mHrsCharacteristic.getDescriptor(BleUUID.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
         descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 		mBluetoothGatt.writeDescriptor(descriptor);
 	}
@@ -322,9 +313,13 @@ public class SportManager implements BleManager<SportManagerCallbacks> {
 	}
 
 	@Override
-	public void serviceToManager(byte[] command) {
+	public void sendUserCommand(byte[] command) {
 		sendCommand(command);
 	}
 
+	@Override
+	public void sendUserCommand(int command) {
+
+	}
 
 }

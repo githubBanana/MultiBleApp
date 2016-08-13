@@ -20,36 +20,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.diy.blelib.profile.bleutils.BleConstant;
+
 public abstract class BleProfileService extends Service implements BleManagerCallbacks {
 	private static final String TAG = "BleProfileService";
 
-	public static final String BROADCAST_CONNECTION_STATE = "no.nordicsemi.android.nrftoolbox.BROADCAST_CONNECTION_STATE";
-	public static final String BROADCAST_SERVICES_DISCOVERED = "no.nordicsemi.android.nrftoolbox.BROADCAST_SERVICES_DISCOVERED";
-	public static final String BROADCAST_BOND_STATE = "no.nordicsemi.android.nrftoolbox.BROADCAST_BOND_STATE";
-	public static final String BROADCAST_BATTERY_LEVEL = "no.nordicsemi.android.nrftoolbox.BROADCAST_BATTERY_LEVEL";
-	public static final String BROADCAST_ERROR = "no.nordicsemi.android.nrftoolbox.BROADCAST_ERROR";
 
-	/** The parameter passed when creating the service. Must contain the address of the sensor that we want to connect to */
-	public static final String EXTRA_DEVICE_ADDRESS = "no.nordicsemi.android.nrftoolbox.EXTRA_DEVICE_ADDRESS";
-	/** The key for the device name that is returned in {@link #BROADCAST_CONNECTION_STATE} with state {@link #STATE_CONNECTED}. */
-	public static final String EXTRA_DEVICE_NAME = "no.nordicsemi.android.nrftoolbox.EXTRA_DEVICE_NAME";
-	public static final String EXTRA_CONNECTION_STATE = "no.nordicsemi.android.nrftoolbox.EXTRA_CONNECTION_STATE";
-	public static final String EXTRA_BOND_STATE = "no.nordicsemi.android.nrftoolbox.EXTRA_BOND_STATE";
-	public static final String EXTRA_SERVICE_PRIMARY = "no.nordicsemi.android.nrftoolbox.EXTRA_SERVICE_PRIMARY";
-	public static final String EXTRA_SERVICE_SECONDARY = "no.nordicsemi.android.nrftoolbox.EXTRA_SERVICE_SECONDARY";
-	public static final String EXTRA_BATTERY_LEVEL = "no.nordicsemi.android.nrftoolbox.EXTRA_BATTERY_LEVEL";
-	public static final String EXTRA_ERROR_MESSAGE = "no.nordicsemi.android.nrftoolbox.EXTRA_ERROR_MESSAGE";
-	public static final String EXTRA_ERROR_CODE = "no.nordicsemi.android.nrftoolbox.EXTRA_ERROR_CODE";
-	public static final String EXTRA_DESTORY_SERVICE = "no.nordicsemi.android.nrftoolbox.EXTRA_DESTORY_SERVICE";
-	public static final int STATE_LINK_LOSS = -1;
-	public static final int STATE_DISCONNECTED = 0;
-	public static final int STATE_CONNECTED = 1;
-	public static final int STATE_CONNECTING = 2;
-	public static final int STATE_DISCONNECTING = 3;
-	//add by siushen 1227
-	public static final int STATE_BROADCAST_ERROR = 4;
-	public static final int STATE_RECONN_FAIL = 5;
-	public static final int EXTRA_DESTORY_SERVICE_INT = 6; //hand to stop ble service
 
 	private BleManager<BleManagerCallbacks> mBleManager;
 	private Handler mHandler;
@@ -71,8 +47,8 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 			}
 
 			// notify user about changing the state to DISCONNECTING
-			final Intent broadcast = new Intent(BROADCAST_CONNECTION_STATE);
-			broadcast.putExtra(EXTRA_CONNECTION_STATE, STATE_DISCONNECTING);
+			final Intent broadcast = new Intent(BleConstant.BROADCAST_CONNECTION_STATE);
+			broadcast.putExtra(BleConstant.EXTRA_CONNECTION_STATE, BleConstant.STATE_DISCONNECTING);
 			LocalBroadcastManager.getInstance(BleProfileService.this).sendBroadcast(broadcast);
 
 			mBleManager.disconnect();
@@ -109,13 +85,17 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		 * notify from service to manager
 		 * @param command
 		 */
-		public void serviceToManager(byte[] command) {
-			mBleManager.serviceToManager(command);
+		public void sendUserCommand(byte[] command) {
+			mBleManager.sendUserCommand(command);
+		}
+		public void sendUserCommand(int command) {
+			mBleManager.sendUserCommand(command);
 		}
 	}
 
 	@Override
 	public IBinder onBind(final Intent intent) {
+		Log.e(TAG, "onBind: " );
 		return getBinder();
 	}
 
@@ -126,6 +106,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 	 */
 	protected LocalBinder getBinder() {
 		// default implementation returns the basic binder. You can overwrite the LocalBinder with your own, wider implementation
+		Log.e(TAG, "getBinder: " );
 		return new LocalBinder();
 	}
 
@@ -146,7 +127,9 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		mBleManager = initializeManager();
 		mBleManager.setGattCallbacks(this);
 		mBlutoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		Log.e(TAG, "onCreate: " );
 	}
+
 
 	@SuppressWarnings("rawtypes")
 	protected abstract BleManager initializeManager();
@@ -155,17 +138,17 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 
 	@Override
 	public int onStartCommand(final Intent intent, final int flags, final int startId) {
-		if (intent == null || !intent.hasExtra(EXTRA_DEVICE_ADDRESS))
+		if (intent == null || !intent.hasExtra(BleConstant.EXTRA_DEVICE_ADDRESS))
 			throw new UnsupportedOperationException("No device address at EXTRA_DEVICE_ADDRESS key");
 
-		mDeviceAddress = intent.getStringExtra(EXTRA_DEVICE_ADDRESS);
-		Log.i(TAG, "Service started");
+		mDeviceAddress = intent.getStringExtra(BleConstant.EXTRA_DEVICE_ADDRESS);
+		Log.e(TAG, "Service started");
 		//每次打开服务再次确认蓝牙是否打开
 		if (!mBlutoothAdapter.isEnabled())
 			mBlutoothAdapter.enable();
 		// notify user about changing the state to CONNECTING
-		final Intent broadcast = new Intent(BROADCAST_CONNECTION_STATE);
-		broadcast.putExtra(EXTRA_CONNECTION_STATE, STATE_CONNECTING);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_CONNECTION_STATE);
+		broadcast.putExtra(BleConstant.EXTRA_CONNECTION_STATE, BleConstant.STATE_CONNECTING);
 		LocalBroadcastManager.getInstance(BleProfileService.this).sendBroadcast(broadcast);
 
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
@@ -189,7 +172,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		final Intent broadcast = new Intent(EXTRA_DESTORY_SERVICE);
+		final Intent broadcast = new Intent(BleConstant.EXTRA_DESTORY_SERVICE);
 		LocalBroadcastManager.getInstance(BleProfileService.this).sendBroadcast(broadcast);
 		// shutdown the manager
 //		if(mBleManager == null)
@@ -206,10 +189,10 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 	public void onDeviceConnected() {
 		mConnected = true;
 
-		final Intent broadcast = new Intent(BROADCAST_CONNECTION_STATE);
-		broadcast.putExtra(EXTRA_CONNECTION_STATE, STATE_CONNECTED);
-		broadcast.putExtra(EXTRA_DEVICE_ADDRESS, mDeviceAddress);
-		broadcast.putExtra(EXTRA_DEVICE_NAME, mDeviceName);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_CONNECTION_STATE);
+		broadcast.putExtra(BleConstant.EXTRA_CONNECTION_STATE, BleConstant.STATE_CONNECTED);
+		broadcast.putExtra(BleConstant.EXTRA_DEVICE_ADDRESS, mDeviceAddress);
+		broadcast.putExtra(BleConstant.EXTRA_DEVICE_NAME, mDeviceName);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 	}
 
@@ -219,8 +202,8 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		Log.w(TAG, "Connection lost");
 		mConnected = false;
 
-		final Intent broadcast = new Intent(BROADCAST_CONNECTION_STATE);
-		broadcast.putExtra(EXTRA_CONNECTION_STATE, STATE_LINK_LOSS);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_CONNECTION_STATE);
+		broadcast.putExtra(BleConstant.EXTRA_CONNECTION_STATE, BleConstant.STATE_LINK_LOSS);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 	}
 
@@ -231,9 +214,9 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		if (optionalServicesFound)
 			Log.v(TAG, "Secondary service found");
 
-		final Intent broadcast = new Intent(BROADCAST_SERVICES_DISCOVERED);
-		broadcast.putExtra(EXTRA_SERVICE_PRIMARY, true);
-		broadcast.putExtra(EXTRA_SERVICE_SECONDARY, optionalServicesFound);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_SERVICES_DISCOVERED);
+		broadcast.putExtra(BleConstant.EXTRA_SERVICE_PRIMARY, true);
+		broadcast.putExtra(BleConstant.EXTRA_SERVICE_SECONDARY, optionalServicesFound);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 	}
 
@@ -242,9 +225,9 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		Log.i(TAG, "Services Discovered");
 		Log.w(TAG, "Device is not supported");
 
-		final Intent broadcast = new Intent(BROADCAST_SERVICES_DISCOVERED);
-		broadcast.putExtra(EXTRA_SERVICE_PRIMARY, false);
-		broadcast.putExtra(EXTRA_SERVICE_SECONDARY, false);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_SERVICES_DISCOVERED);
+		broadcast.putExtra(BleConstant.EXTRA_SERVICE_PRIMARY, false);
+		broadcast.putExtra(BleConstant.EXTRA_SERVICE_SECONDARY, false);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 
 		// no need for disconnecting, it will be disconnected by the manager automatically
@@ -254,8 +237,8 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 	public void onBatteryValueReceived(final int value) {
 		Log.i(TAG, "Battery level received: " + value + "%");
 
-		final Intent broadcast = new Intent(BROADCAST_BATTERY_LEVEL);
-		broadcast.putExtra(EXTRA_BATTERY_LEVEL, value);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_BATTERY_LEVEL);
+		broadcast.putExtra(BleConstant.EXTRA_BATTERY_LEVEL, value);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 	}
 
@@ -264,8 +247,8 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		Log.v(TAG, "Bond state: Bonding...");
 //		showToast(R.string.bonding);
 
-		final Intent broadcast = new Intent(BROADCAST_BOND_STATE);
-		broadcast.putExtra(EXTRA_BOND_STATE, BluetoothDevice.BOND_BONDING);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_BOND_STATE);
+		broadcast.putExtra(BleConstant.EXTRA_BOND_STATE, BluetoothDevice.BOND_BONDING);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 	}
 
@@ -274,8 +257,8 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		Log.i(TAG, "Bond state: Bonded");
 //		showToast(R.string.bonded);
 
-		final Intent broadcast = new Intent(BROADCAST_BOND_STATE);
-		broadcast.putExtra(EXTRA_BOND_STATE, BluetoothDevice.BOND_BONDED);
+		final Intent broadcast = new Intent(BleConstant.BROADCAST_BOND_STATE);
+		broadcast.putExtra(BleConstant.EXTRA_BOND_STATE, BluetoothDevice.BOND_BONDED);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 	}
 	@Override
@@ -283,9 +266,9 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		// TODO Auto-generated method stub
 		Log.e(TAG, message + " (" + errorCode + ")");
 		if(serviceLife) {
-			final Intent broadcast = new Intent(BROADCAST_ERROR);
-			broadcast.putExtra(EXTRA_ERROR_MESSAGE, message);
-			broadcast.putExtra(EXTRA_ERROR_CODE, errorCode);
+			final Intent broadcast = new Intent(BleConstant.BROADCAST_ERROR);
+			broadcast.putExtra(BleConstant.EXTRA_ERROR_MESSAGE, message);
+			broadcast.putExtra(BleConstant.EXTRA_ERROR_CODE, errorCode);
 			LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 			mBleManager.disconnect();
 		}
@@ -299,8 +282,8 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		mDeviceAddress = null;
 		mDeviceName = null;
 		if(serviceLife) {
-			final Intent broadcast = new Intent(BROADCAST_CONNECTION_STATE);
-			broadcast.putExtra(EXTRA_CONNECTION_STATE, STATE_DISCONNECTED);
+			final Intent broadcast = new Intent(BleConstant.BROADCAST_CONNECTION_STATE);
+			broadcast.putExtra(BleConstant.EXTRA_CONNECTION_STATE, BleConstant.STATE_DISCONNECTED);
 			LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 		}
 		// user requested disconnection. We must stop the service

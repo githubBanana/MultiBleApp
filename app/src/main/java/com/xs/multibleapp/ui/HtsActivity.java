@@ -3,10 +3,13 @@ package com.xs.multibleapp.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.diy.blelib.ble.hts.HtsService;
 import com.diy.blelib.profile.BleProfileService;
 import com.diy.blelib.profile.BleProfileServiceReadyActivity;
+import com.diy.blelib.profile.bleutils.BleConstant;
+import com.diy.blelib.profile.bleutils.BleUUID;
 import com.xs.multibleapp.MainViewActivity;
 import com.xs.multibleapp.R;
 
@@ -27,38 +30,68 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
         context.startActivity(intent);
     }
 
-
-    @Override
-    protected Class<? extends BleProfileService> getServiceClass() {
-        return HtsService.class;
-    }
-
     @Override
     protected void onCreateView(Bundle savedInstanceState) {
         setContentView(R.layout.hts_activity);
+        Log.e(TAG, "onCreateView: " );
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setTitle(getIntent().getStringExtra(MainViewActivity.TITLE));
+        Log.e(TAG, "onResume: " );
     }
 
+
+    /**
+     * 指定 绑定服务
+     * @return
+     */
+    @Override
+    protected Class<? extends BleProfileService> getServiceClass() {
+        return HtsService.class;
+    }
+
+    /**
+     * 发现设备服务
+     * @param optionalServicesFound if <code>true</code> the secondary services were also found on the device.
+     */
     @Override
     public void onServicesDiscovered(boolean optionalServicesFound) {
-
+        // this may notify user or show some views
     }
 
+    /**
+     * 根据连接状态更新UI
+     * @param status
+     */
     @Override
-    protected void setDefaultUI() {
+    protected void setUIConnectStatus(int status) {
+        switch (status) {
+            case BleConstant.STATE_CONNECTED:
 
+                break;
+            case BleConstant.STATE_DISCONNECTED:
+
+                break;
+        }
     }
 
+    /**
+     * 根据服务UUID过滤出可用设备
+     * @return
+     */
     @Override
     protected UUID getFilterUUID() {
-        return null;
+        return BleUUID.TP_SERVICE_UUID;
     }
 
+
+    /**
+     * 根据服务连接状态更新UI等
+     * @param binder
+     */
     @Override
     protected void onServiceBinded(HtsService.RSCBinder binder) {
         // no use

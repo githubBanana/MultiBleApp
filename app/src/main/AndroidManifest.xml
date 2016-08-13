@@ -14,15 +14,23 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainViewActivity">
+        <activity android:name=".MainViewActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.HtsActivity"/>
+        <activity android:name=".ui.HtsActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+
+        </activity>
         <service android:name=".ble.service.ScanService"/>
+        <service android:name="com.diy.blelib.ble.hts.HtsService"/>
+        <service android:name="com.diy.blelib.ble.ropeskip.RopeSkipService"/>
+        <service android:name="com.diy.blelib.ble.sport.SportService"/>
     </application>
 
 </manifest>

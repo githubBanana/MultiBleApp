@@ -21,11 +21,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import com.diy.blelib.exception.BleErrorInfo;
+import com.diy.blelib.profile.bleutils.exception.BleErrorInfo;
 import com.diy.blelib.profile.BleManager;
+import com.diy.blelib.profile.bleutils.BleUUID;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * HTSManager class performs BluetoothGatt operations for connection, service discovery, enabling indication and reading characteristics. All operations required to connect to device with BLE HT
@@ -36,11 +36,6 @@ public class RopeSkipManager implements BleManager<RopeSkipManagerCallbacks> {
 	private RopeSkipManagerCallbacks mCallbacks;
 	private BluetoothGatt mBluetoothGatt;
 	private Context mContext;
-	//心率服务
-	public final static UUID HR_SERVICE_UUID = UUID.fromString("0000180D-0000-1000-8000-00805f9b34fb");
-	private static final UUID HR_SENSOR_LOCATION_CHARACTERISTIC_UUID = UUID.fromString("00002A38-0000-1000-8000-00805f9b34fb");
-	private static final UUID HR_MEASUREMENT_CHARACTERISTIC_UUID = UUID.fromString("00002A37-0000-1000-8000-00805f9b34fb");
-    private static final UUID CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
 	private BluetoothGattCharacteristic  mBatteryCharacteritsic,mRopeSkipReadCharacteristic,mRopeSkipWriteCharacteristic;
 
@@ -130,9 +125,9 @@ public class RopeSkipManager implements BleManager<RopeSkipManagerCallbacks> {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				List<BluetoothGattService> services = gatt.getServices();
 				for (BluetoothGattService service : services) {
-					if (service.getUuid().equals(HR_SERVICE_UUID)) {
-						mRopeSkipReadCharacteristic = service.getCharacteristic(HR_MEASUREMENT_CHARACTERISTIC_UUID);
-						mRopeSkipWriteCharacteristic = service.getCharacteristic(HR_SENSOR_LOCATION_CHARACTERISTIC_UUID);
+					if (service.getUuid().equals(BleUUID.HR_SERVICE_UUID)) {
+						mRopeSkipReadCharacteristic = service.getCharacteristic(BleUUID.HR_MEASUREMENT_CHARACTERISTIC_UUID);
+						mRopeSkipWriteCharacteristic = service.getCharacteristic(BleUUID.HR_SENSOR_LOCATION_CHARACTERISTIC_UUID);
                     }
 				}
 
@@ -168,7 +163,7 @@ public class RopeSkipManager implements BleManager<RopeSkipManagerCallbacks> {
          */
 		@Override
 		public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-			if(characteristic.getUuid().equals(HR_MEASUREMENT_CHARACTERISTIC_UUID)) {
+			if(characteristic.getUuid().equals(BleUUID.HR_MEASUREMENT_CHARACTERISTIC_UUID)) {
 				//handler data
 				byte[] data = characteristic.getValue();
 			}
@@ -199,7 +194,7 @@ public class RopeSkipManager implements BleManager<RopeSkipManagerCallbacks> {
 	 */
 	private void enableHRNotification() {
 		mBluetoothGatt.setCharacteristicNotification(mRopeSkipReadCharacteristic, true);
-		BluetoothGattDescriptor descriptor = mRopeSkipReadCharacteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
+		BluetoothGattDescriptor descriptor = mRopeSkipReadCharacteristic.getDescriptor(BleUUID.CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR_UUID);
         descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 		mBluetoothGatt.writeDescriptor(descriptor);
 	}
@@ -231,10 +226,14 @@ public class RopeSkipManager implements BleManager<RopeSkipManagerCallbacks> {
 	}
 
 	@Override
-	public void serviceToManager(byte[] command) {
+	public void sendUserCommand(byte[] command) {
 		sendCommand(command);
 	}
 
+	@Override
+	public void sendUserCommand(int command) {
+
+	}
 
 
 }

@@ -43,7 +43,7 @@ public class SportActivity extends BleProfileServiceReadyActivity<SportService.R
     }
 
     @Override
-    protected void setDefaultUI() {
+    protected void setUIConnectStatus(int status) {
 
     }
 

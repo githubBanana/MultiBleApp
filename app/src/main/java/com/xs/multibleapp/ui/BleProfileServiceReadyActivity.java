@@ -19,7 +19,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.diy.blelib.profile;
+package com.xs.multibleapp.ui;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -44,6 +44,8 @@ import android.widget.Toast;
 
 import com.diy.blelib.R;
 import com.diy.blelib.expand.base.BaseActivity;
+import com.diy.blelib.profile.BleManagerCallbacks;
+import com.diy.blelib.profile.BleProfileService;
 import com.diy.blelib.profile.bleutils.BleConstant;
 import com.diy.blelib.scanner.ScannerFragment;
 
@@ -185,7 +187,6 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		if (!isBLEEnabled()) {
 			showBLEDialog();
 		}
-
 
 		onCreateView(savedInstanceState);
 

@@ -43,9 +43,10 @@ public interface BleManager<E extends BleManagerCallbacks> {
 	public void closeBluetoothGatt();
 
 	/**
-	 * notify from service to manager
+	 * notify from activity-> service -> manager
 	 * @param command
 	 */
-	public void serviceToManager(byte[] command);
+	public void sendUserCommand(byte[] command);
+	public void sendUserCommand(int command);
 
 }
