@@ -83,8 +83,9 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
      * @return
      */
     @Override
-    protected UUID getFilterUUID() {
-        return BleUUID.TP_SERVICE_UUID;
+    protected UUID[] getFilterUUID() {
+        UUID[] uuids = new UUID[]{BleUUID.TP_SERVICE_UUID};
+        return uuids;
     }
 
 

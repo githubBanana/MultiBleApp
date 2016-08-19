@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.diy.blelib.ble.sport.SportService;
 import com.diy.blelib.profile.BleProfileService;
 import com.diy.blelib.profile.BleProfileServiceReadyActivity;
+import com.diy.blelib.profile.bleutils.BleUUID;
 
 import java.util.UUID;
 
@@ -48,7 +49,8 @@ public class SportActivity extends BleProfileServiceReadyActivity<SportService.R
     }
 
     @Override
-    protected UUID getFilterUUID() {
-        return null;
+    protected UUID[] getFilterUUID() {
+        UUID[] uuids = new UUID[]{BleUUID.TP_SERVICE_UUID};
+        return uuids;
     }
 }

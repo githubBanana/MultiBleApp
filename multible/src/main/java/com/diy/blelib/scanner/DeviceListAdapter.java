@@ -1,14 +1,28 @@
-/*******************************************************************************
- * Copyright (c) 2013 Nordic Semiconductor. All Rights Reserved.
+/*
+ * Copyright (c) 2015, Nordic Semiconductor
+ * All rights reserved.
  *
- * The information contained herein is property of Nordic Semiconductor ASA. Terms and conditions of usage are described in detail in NORDIC SEMICONDUCTOR STANDARD SOFTWARE LICENSE AGREEMENT.
- * Licensees are granted free, non-transferable use of the information. NO WARRANTY of ANY KIND is provided. This heading must NOT be removed from the file.
- ******************************************************************************/
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.diy.blelib.scanner;
 
-import java.util.ArrayList;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +32,11 @@ import android.widget.TextView;
 
 import com.diy.blelib.R;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import no.nordicsemi.android.support.v18.scanner.ScanResult;
 
 /**
  * DeviceListAdapter class is list adapter for showing scanned Devices name, address and RSSI image based on RSSI values.
@@ -27,59 +46,51 @@ public class DeviceListAdapter extends BaseAdapter {
 	private static final int TYPE_ITEM = 1;
 	private static final int TYPE_EMPTY = 2;
 
-	private final ArrayList<ExtendedBluetoothDevice> mListBondedValues = new ArrayList<ExtendedBluetoothDevice>();
-	private final ArrayList<ExtendedBluetoothDevice> mListValues = new ArrayList<ExtendedBluetoothDevice>();
+	private final ArrayList<ExtendedBluetoothDevice> mListBondedValues = new ArrayList<>();
+	private final ArrayList<ExtendedBluetoothDevice> mListValues = new ArrayList<>();
 	private final Context mContext;
-	private final ExtendedBluetoothDevice.AddressComparator comparator = new ExtendedBluetoothDevice.AddressComparator();
 
 	public DeviceListAdapter(Context context) {
 		mContext = context;
 	}
 
-	public void addBondedDevice(ExtendedBluetoothDevice device) {
-		mListBondedValues.add(device);
+	/**
+	 * Sets a list of bonded devices.
+	 * @param devices list of bonded devices.
+	 */
+	public void addBondedDevices(final Set<BluetoothDevice> devices) {
+		final List<ExtendedBluetoothDevice> bondedDevices = mListBondedValues;
+		for (BluetoothDevice device : devices) {
+			bondedDevices.add(new ExtendedBluetoothDevice(device));
+		}
 		notifyDataSetChanged();
 	}
 
 	/**
-	 * Looks for the device with the same address as given one in the list of bonded devices. If the device has been found it updates its RSSI value.
-	 *
-	 * @param address
-	 *            the device address
-	 * @param rssi
-	 *            the RSSI of the scanned device
+	 * Updates the list of not bonded devices.
+	 * @param results list of results from the scanner
 	 */
-	public void updateRssiOfBondedDevice(String address, int rssi) {
-		comparator.address = address;
-		final int indexInBonded = mListBondedValues.indexOf(comparator);
-		if (indexInBonded >= 0) {
-			ExtendedBluetoothDevice previousDevice = mListBondedValues.get(indexInBonded);
-			previousDevice.rssi = rssi;
-			notifyDataSetChanged();
+	public void update(final List<ScanResult> results) {
+		for (final ScanResult result : results) {
+			final ExtendedBluetoothDevice device = findDevice(result);
+			if (device == null) {
+				mListValues.add(new ExtendedBluetoothDevice(result));
+			} else {
+				device.name = result.getScanRecord() != null ? result.getScanRecord().getDeviceName() : null;
+				device.rssi = result.getRssi();
+			}
 		}
+		notifyDataSetChanged();
 	}
 
-	/**
-	 * If such device exists on the bonded device list, this method does nothing. If not then the device is updated (rssi value) or added.
-	 *
-	 * @param device
-	 *            the device to be added or updated
-	 */
-	public void addOrUpdateDevice(ExtendedBluetoothDevice device) {
-		final boolean indexInBonded = mListBondedValues.contains(device);
-		if (indexInBonded) {
-			return;
-		}
-
-		final int indexInNotBonded = mListValues.indexOf(device);
-		if (indexInNotBonded >= 0) {
-			ExtendedBluetoothDevice previousDevice = mListValues.get(indexInNotBonded);
-			previousDevice.rssi = device.rssi;
-			notifyDataSetChanged();
-			return;
-		}
-		mListValues.add(device);
-		notifyDataSetChanged();
+	private ExtendedBluetoothDevice findDevice(final ScanResult result) {
+		for (final ExtendedBluetoothDevice device : mListBondedValues)
+			if (device.matches(result))
+				return device;
+		for (final ExtendedBluetoothDevice device : mListValues)
+			if (device.matches(result))
+				return device;
+		return null;
 	}
 
 	public void clearDevices() {
@@ -100,9 +111,8 @@ public class DeviceListAdapter extends BaseAdapter {
 	public Object getItem(int position) {
 		final int bondedCount = mListBondedValues.size() + 1; // 1 for the title
 		if (mListBondedValues.isEmpty()) {
-			if (position == 0) {
+			if (position == 0)
 				return R.string.scanner_subtitle__not_bonded;
-			}
 			else
 				return mListValues.get(position - 1);
 		} else {
@@ -157,41 +167,41 @@ public class DeviceListAdapter extends BaseAdapter {
 
 		View view = oldView;
 		switch (type) {
-		case TYPE_EMPTY:
-			if (view == null) {
-				view = inflater.inflate(R.layout.device_list_empty, parent, false);
-			}
-			break;
-		case TYPE_TITLE:
-			if (view == null) {
-				view = inflater.inflate(R.layout.device_list_title, parent, false);
-			}
-			final TextView title = (TextView) view;
-			title.setText((Integer) getItem(position));
-			break;
-		default:
-			if (view == null) {
-				view = inflater.inflate(R.layout.device_list_row, parent, false);
-				final ViewHolder holder = new ViewHolder();
-				holder.name = (TextView) view.findViewById(R.id.name);
-				holder.address = (TextView) view.findViewById(R.id.address);
-				holder.rssi = (ImageView) view.findViewById(R.id.rssi);
-				view.setTag(holder);
-			}
+			case TYPE_EMPTY:
+				if (view == null) {
+					view = inflater.inflate(R.layout.device_list_empty, parent, false);
+				}
+				break;
+			case TYPE_TITLE:
+				if (view == null) {
+					view = inflater.inflate(R.layout.device_list_title, parent, false);
+				}
+				final TextView title = (TextView) view;
+				title.setText((Integer) getItem(position));
+				break;
+			default:
+				if (view == null) {
+					view = inflater.inflate(R.layout.device_list_row, parent, false);
+					final ViewHolder holder = new ViewHolder();
+					holder.name = (TextView) view.findViewById(R.id.name);
+					holder.address = (TextView) view.findViewById(R.id.address);
+					holder.rssi = (ImageView) view.findViewById(R.id.rssi);
+					view.setTag(holder);
+				}
 
-			final ExtendedBluetoothDevice device = (ExtendedBluetoothDevice) getItem(position);
-			final ViewHolder holder = (ViewHolder) view.getTag();
-			final String name = device.name;
-			holder.name.setText(name != null ? name : mContext.getString(R.string.not_available));
-			holder.address.setText(device.device.getAddress());
-			if (!device.isBonded || device.rssi != ScannerFragment.NO_RSSI) {
-				final int rssiPercent = (int) (100.0f * (127.0f + device.rssi) / (127.0f + 20.0f));
-				holder.rssi.setImageLevel(rssiPercent);
-				holder.rssi.setVisibility(View.VISIBLE);
-			} else {
-				holder.rssi.setVisibility(View.GONE);
-			}
-			break;
+				final ExtendedBluetoothDevice device = (ExtendedBluetoothDevice) getItem(position);
+				final ViewHolder holder = (ViewHolder) view.getTag();
+				final String name = device.name;
+				holder.name.setText(name != null ? name : mContext.getString(R.string.not_available));
+				holder.address.setText(device.device.getAddress());
+				if (!device.isBonded || device.rssi != ExtendedBluetoothDevice.NO_RSSI) {
+					final int rssiPercent = (int) (100.0f * (127.0f + device.rssi) / (127.0f + 20.0f));
+					holder.rssi.setImageLevel(rssiPercent);
+					holder.rssi.setVisibility(View.VISIBLE);
+				} else {
+					holder.rssi.setVisibility(View.GONE);
+				}
+				break;
 		}
 
 		return view;

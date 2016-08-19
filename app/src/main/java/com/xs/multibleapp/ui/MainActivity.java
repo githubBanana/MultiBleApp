@@ -14,8 +14,6 @@ import com.diy.blelib.scanner.ScannerFragment;
 import com.xs.multibleapp.R;
 import com.xs.multibleapp.ble.service.ScanService;
 
-import java.util.UUID;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 ,ScannerFragment.OnDeviceSelectedListener{
 
@@ -37,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startService(intent);
                 bindService(intent,mSportServiceConn,0);
 
-                ScannerFragment.getInstance(this, UUID.fromString("uuid"),true).show(getSupportFragmentManager(),"tag");
+//                ScannerFragment.getInstance(UUID.fromString("uuid")).show(getSupportFragmentManager(),"tag");
 
                 break;
         }

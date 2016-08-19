@@ -476,9 +476,6 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 * @return the required UUID or <code>null</code>
 	 */
 	protected abstract UUID getFilterUUID();
-	private  boolean isCustomFilterUUID() {
-		return false;
-	}
 
 	/**
 	 * Shows the scanner fragment.
@@ -487,7 +484,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 * @see #getFilterUUID()
 	 */
 	private void showDeviceScanningDialog() {
-		final ScannerFragment dialog = ScannerFragment.getInstance(this,getFilterUUID(),isCustomFilterUUID());
+		final ScannerFragment dialog = ScannerFragment.getInstance(getFilterUUID());
 		dialog.show(getSupportFragmentManager(), ScannerFragment.TAG);
 	}
 

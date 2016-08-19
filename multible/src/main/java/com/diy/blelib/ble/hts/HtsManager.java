@@ -38,7 +38,7 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 	private BluetoothGatt mBluetoothGatt;
 	private Context mContext;
 
-	private BluetoothGattCharacteristic  mBatteryCharacteritsic,mRopeSkipReadCharacteristic,mRopeSkipWriteCharacteristic;
+	private BluetoothGattCharacteristic  mBatteryCharacteritsic,mHtsCharacteristic;
 
 	private static HtsManager managerInstance = null;
 
@@ -89,8 +89,8 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 
 			if (bondState == BluetoothDevice.BOND_BONDED) {
 				// We've read Battery Level, now enabling HT indications
-				if (mRopeSkipReadCharacteristic != null) {
-					BleUtil.enableHRNotification(mBluetoothGatt,mRopeSkipReadCharacteristic);
+				if (mHtsCharacteristic != null) {
+					BleUtil.enableTPIndication(mBluetoothGatt,mHtsCharacteristic);
 				}
 				mContext.unregisterReceiver(this);
 				mCallbacks.onBonded();
@@ -126,14 +126,13 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				List<BluetoothGattService> services = gatt.getServices();
 				for (BluetoothGattService service : services) {
-					if (service.getUuid().equals(BleUUID.HR_SERVICE_UUID)) {
-						mRopeSkipReadCharacteristic = service.getCharacteristic(BleUUID.HR_MEASUREMENT_CHARACTERISTIC_UUID);
-						mRopeSkipWriteCharacteristic = service.getCharacteristic(BleUUID.HR_SENSOR_LOCATION_CHARACTERISTIC_UUID);
+					if (service.getUuid().equals(BleUUID.TP_SERVICE_UUID)) {
+						mHtsCharacteristic = service.getCharacteristic(BleUUID.TP_MEASUREMENT_CHARACTERISTIC_UUID);
                     }
 				}
 
-				if (mRopeSkipReadCharacteristic != null) {
-					BleUtil.enableHRNotification(mBluetoothGatt,mRopeSkipReadCharacteristic);
+				if (mHtsCharacteristic != null) {
+					BleUtil.enableTPIndication(mBluetoothGatt,mHtsCharacteristic);
 					mCallbacks.onServicesDiscovered(false);
                 } else {
 					mCallbacks.onDeviceNotSupported();
@@ -164,7 +163,7 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
          */
 		@Override
 		public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-			if(characteristic.getUuid().equals(BleUUID.HR_MEASUREMENT_CHARACTERISTIC_UUID)) {
+			if(characteristic.getUuid().equals(BleUUID.TP_MEASUREMENT_CHARACTERISTIC_UUID)) {
 				//handler data
 				byte[] data = characteristic.getValue();
 			}
@@ -196,9 +195,9 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 	 *  发送命令
 	 * @param command
 	 */
-	void sendCommand(byte[] command) {
-		mRopeSkipWriteCharacteristic.setValue(command);
-		mBluetoothGatt.writeCharacteristic(mRopeSkipWriteCharacteristic);
+	void sendCommand(byte[] command) {//温度服务没有下发命令的接口
+		mHtsCharacteristic.setValue(command);
+		mBluetoothGatt.writeCharacteristic(mHtsCharacteristic);
 	}
 
 
@@ -213,7 +212,7 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 			mBluetoothGatt.close();
 			mBluetoothGatt = null;
 			mBatteryCharacteritsic = null;
-			mRopeSkipReadCharacteristic = null;
+			mHtsCharacteristic = null;
 
 		}
 	}
