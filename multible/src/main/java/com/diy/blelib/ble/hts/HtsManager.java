@@ -166,6 +166,11 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 			if(characteristic.getUuid().equals(BleUUID.TP_MEASUREMENT_CHARACTERISTIC_UUID)) {
 				//handler data
 				byte[] data = characteristic.getValue();
+				try {
+					Log.e(TAG, "onCharacteristicChanged: "+BleUtil.decodeTemperature(characteristic.getValue()) );
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 

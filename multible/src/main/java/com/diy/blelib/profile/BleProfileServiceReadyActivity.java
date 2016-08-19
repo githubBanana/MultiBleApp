@@ -202,7 +202,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		 * notified via mServiceConnection.
 		 */
 		final Intent service = new Intent(this, getServiceClass());
-		if (bindService(service, mServiceConnection, BIND_AUTO_CREATE)) // we pass 0 as a flag so the service will not be created if not exists
+		if (bindService(service, mServiceConnection, 0)) // we pass 0 as a flag so the service will not be created if not exists
 			Log.e(TAG, "Binding to the service..."); // (* - see the comment below)
 	}
 
