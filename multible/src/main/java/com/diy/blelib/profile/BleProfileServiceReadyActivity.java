@@ -145,6 +145,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 					final String message = intent.getStringExtra(BleConstant.EXTRA_ERROR_MESSAGE);
 					final int errorCode = intent.getIntExtra(BleConstant.EXTRA_ERROR_CODE, 0);
 					onError(message, errorCode);
+					onDeviceDisconnected();
 					break;
 				}
 			}
@@ -473,6 +474,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 * {@link #isChangingConfigurations()}.
 	 *
 	 * @return the required UUID or <code>null</code>
+	 *
 	 */
 	protected abstract UUID[] getFilterUUID();
 

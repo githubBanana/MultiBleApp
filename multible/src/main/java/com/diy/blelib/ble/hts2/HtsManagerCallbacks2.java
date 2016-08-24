@@ -6,7 +6,7 @@
  * Licensees are granted free, non-transferable use of the information. NO WARRANTY of ANY KIND is provided.
  * This heading must NOT be removed from the file.
  ******************************************************************************/
-package com.diy.blelib.ble.hts;
+package com.diy.blelib.ble.hts2;
 
 
 import com.diy.blelib.profile.BleManagerCallbacks;
@@ -14,7 +14,7 @@ import com.diy.blelib.profile.BleManagerCallbacks;
 /**
  * Interface { HTSManagerCallbacks} must be implemented by { HTSActivity} in order to receive callbacks from { HTSManager}
  */
-public interface HtsManagerCallbacks extends BleManagerCallbacks {
+public interface HtsManagerCallbacks2 extends BleManagerCallbacks {
 
 	/**
 	 * Called when Sport Thermometer value has been received

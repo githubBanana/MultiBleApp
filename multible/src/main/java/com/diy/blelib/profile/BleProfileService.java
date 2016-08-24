@@ -128,6 +128,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 		mBleManager.setGattCallbacks(this);
 		mBlutoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		Log.e(TAG, "onCreate: " );
+		Log.e(TAG, "ggggggggggggggggonCreate: " );
 	}
 
 
@@ -138,6 +139,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 
 	@Override
 	public int onStartCommand(final Intent intent, final int flags, final int startId) {
+		Log.e(TAG, "ggggggggggggggggononStartCommand: " );
 		if (intent == null || !intent.hasExtra(BleConstant.EXTRA_DEVICE_ADDRESS))
 			throw new UnsupportedOperationException("No device address at EXTRA_DEVICE_ADDRESS key");
 
@@ -272,7 +274,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 			LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 			mBleManager.disconnect();
 		}
-	//	stopSelf();
+		stopSelf();
 	}
 	@Override
 	public void onDeviceDisconnected() {
@@ -287,7 +289,7 @@ public abstract class BleProfileService extends Service implements BleManagerCal
 			LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
 		}
 		// user requested disconnection. We must stop the service
-//		stopSelf();
+		stopSelf();
 	}
 
 	/**

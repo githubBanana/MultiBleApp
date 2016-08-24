@@ -9,6 +9,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.PullLoaderRecyclerView;
 import com.xs.multibleapp.adapter.HomeAdapter;
 import com.xs.multibleapp.bean.GridViewItemData;
+import com.xs.multibleapp.ui.Hts2Activity;
 import com.xs.multibleapp.ui.HtsActivity;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class MainViewActivity extends AppCompatActivity implements BaseQuickAdap
         _list.add(new GridViewItemData(getString(R.string.hts_title),R.mipmap.home_1));
         _list.add(new GridViewItemData(getString(R.string.ropeskip_title),R.mipmap.home_2));
         _list.add(new GridViewItemData(getString(R.string.sport_title),R.mipmap.home_3));
-        _list.add(new GridViewItemData("4",R.mipmap.home_4));
+        _list.add(new GridViewItemData(getString(R.string.hts_title2),R.mipmap.home_4));
         _list.add(new GridViewItemData("5",R.mipmap.home_5));
         _list.add(new GridViewItemData("6",R.mipmap.home_6));
 
@@ -51,6 +52,8 @@ public class MainViewActivity extends AppCompatActivity implements BaseQuickAdap
         GridViewItemData item = _list.get(i);
         if (getString(R.string.hts_title).equals(item.text)) {
             HtsActivity.runAct(this,getString(R.string.hts_title));
+        } else if (getString(R.string.hts_title2).equals(item.text)) {
+            Hts2Activity.runAct(this,getString(R.string.hts_title2));
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.diy.blelib.ble.hts;
+package com.diy.blelib.ble.hts2;
 
 import android.content.Intent;
 import android.os.IBinder;
@@ -8,14 +8,14 @@ import android.util.Log;
 import com.diy.blelib.profile.BleManager;
 import com.diy.blelib.profile.BleProfileService;
 
-public class HtsService extends BleProfileService implements HtsManagerCallbacks {
-	private static final String TAG = HtsService.class.getSimpleName();
+public class HtsService2 extends BleProfileService implements HtsManagerCallbacks2 {
+	private static final String TAG = HtsService2.class.getSimpleName();
 
-	public static final String BROADCAST_HTS_MEASUREMENT = "com.diy.blelib.ble.HtsService.BROADCAST_HRS_MEASUREMENT";
-	public static final String EXTRA_HTS = "com.diy.blelib.ble.HtsService.EXTRA_HEART";
+	public static final String BROADCAST_HTS_MEASUREMENT = "com.diy.blelib.ble.HtsService2.BROADCAST_HRS_MEASUREMENT";
+	public static final String EXTRA_HTS = "com.diy.blelib.ble.HtsService2.EXTRA_HEART";
 
 
-	private HtsManager mManager;
+	private HtsManager2 mManager;
 	private boolean mBinded;
 
 	private final LocalBinder mBinder = new RSCBinder();
@@ -44,8 +44,8 @@ public class HtsService extends BleProfileService implements HtsManagerCallbacks
 	}
 
 	@Override
-	protected BleManager<HtsManagerCallbacks> initializeManager() {
-		return mManager = HtsManager.getManager();
+	protected BleManager<HtsManagerCallbacks2> initializeManager() {
+		return mManager = HtsManager2.getManager();
 	}
 
 	@Override

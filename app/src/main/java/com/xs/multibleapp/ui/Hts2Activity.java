@@ -9,8 +9,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.widget.TextView;
 
 import com.diy.blelib.ble.hts.HtsService;
+import com.diy.blelib.ble.hts2.HtsService2;
 import com.diy.blelib.profile.BleProfileService;
-import com.diy.blelib.profile.BleProfileServiceReadyActivity;
 import com.diy.blelib.profile.bleutils.BleConstant;
 import com.diy.blelib.profile.bleutils.BleUUID;
 import com.xs.multibleapp.MainViewActivity;
@@ -24,12 +24,13 @@ import java.util.UUID;
  * @date: 2016-08-12 16:29
  * @email Xs.lin@foxmail.com
  */
-public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBinder> {
+public class Hts2Activity extends BleProfileServiceReadyActivity<HtsService2.RSCBinder> {
     private static final String TAG = "HtsActivity";
 
     private TextView mTvHtsShow;
+    private TextView mTvHtsShow2;
     public static void runAct(Context context,String title) {
-        Intent intent = new Intent(context,HtsActivity.class);
+        Intent intent = new Intent(context,Hts2Activity.class);
         intent.putExtra(MainViewActivity.TITLE,title);
         context.startActivity(intent);
     }
@@ -37,8 +38,12 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
     @Override
     protected void onCreateView(Bundle savedInstanceState) {
         setContentView(R.layout.hts_activity);
-        LocalBroadcastManager.getInstance(this).registerReceiver(_receiver,new IntentFilter(HtsService.BROADCAST_HTS_MEASUREMENT));
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(HtsService2.BROADCAST_HTS_MEASUREMENT);
+        intentFilter.addAction(HtsService.BROADCAST_HTS_MEASUREMENT);
+        LocalBroadcastManager.getInstance(this).registerReceiver(_receiver,intentFilter);
         mTvHtsShow = (TextView) findViewById(R.id.tv_hts_show);
+        mTvHtsShow2 = (TextView) findViewById(R.id.tv_hts_show2);
     }
 
     @Override
@@ -59,7 +64,7 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
      */
     @Override
     protected Class<? extends BleProfileService> getServiceClass() {
-        return HtsService.class;
+        return HtsService2.class;
     }
 
     /**
@@ -79,10 +84,10 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
     protected void setUIConnectStatus(int status) {
         switch (status) {
             case BleConstant.STATE_CONNECTED:
-                mTvHtsShow.setText("已连");
+                mTvHtsShow2.setText("已连");
                 break;
             case BleConstant.STATE_DISCONNECTED:
-                mTvHtsShow.setText("断连");
+                mTvHtsShow2.setText("断连");
                 break;
         }
     }
@@ -103,7 +108,7 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
      * @param binder
      */
     @Override
-    protected void onServiceBinded(HtsService.RSCBinder binder) {
+    protected void onServiceBinded(HtsService2.RSCBinder binder) {
         // no use
     }
 
@@ -115,6 +120,15 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
     private BroadcastReceiver _receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (HtsService2.BROADCAST_HTS_MEASUREMENT.equals(intent.getAction())) {
+                final float value = intent.getFloatExtra(HtsService2.EXTRA_HTS,0.0f);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTvHtsShow2.setText(String.valueOf(value)+"℃");
+                    }
+                });
+            }
             if (HtsService.BROADCAST_HTS_MEASUREMENT.equals(intent.getAction())) {
                 final float value = intent.getFloatExtra(HtsService.EXTRA_HTS,0.0f);
                 runOnUiThread(new Runnable() {
@@ -124,6 +138,7 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
                     }
                 });
             }
+
         }
     };
 }

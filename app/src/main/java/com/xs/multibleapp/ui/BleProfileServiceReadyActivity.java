@@ -107,7 +107,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 							onDeviceDisconnecting();
 							break;
 						}
-							// current implementation does nothing in this states
+						// current implementation does nothing in this states
 						default:
 							// there should be no other actions
 							break;
@@ -147,6 +147,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 					final String message = intent.getStringExtra(BleConstant.EXTRA_ERROR_MESSAGE);
 					final int errorCode = intent.getIntExtra(BleConstant.EXTRA_ERROR_CODE, 0);
 					onError(message, errorCode);
+					onDeviceDisconnected();
 					break;
 				}
 			}
@@ -188,6 +189,7 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 			showBLEDialog();
 		}
 
+
 		onCreateView(savedInstanceState);
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(mCommonBroadcastReceiver, makeIntentFilter());
@@ -203,8 +205,9 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 		 * notified via mServiceConnection.
 		 */
 		final Intent service = new Intent(this, getServiceClass());
-		if (bindService(service, mServiceConnection, BIND_AUTO_CREATE)) // we pass 0 as a flag so the service will not be created if not exists
+		if (bindService(service, mServiceConnection, 0)) { // we pass 0 as a flag so the service will not be created if not exists
 			Log.e(TAG, "Binding to the service..."); // (* - see the comment below)
+		}
 	}
 
 	@Override
@@ -474,8 +477,9 @@ public abstract class BleProfileServiceReadyActivity<E extends BleProfileService
 	 * {@link #isChangingConfigurations()}.
 	 *
 	 * @return the required UUID or <code>null</code>
+	 *
 	 */
-	protected abstract UUID getFilterUUID();
+	protected abstract UUID[] getFilterUUID();
 
 	/**
 	 * Shows the scanner fragment.

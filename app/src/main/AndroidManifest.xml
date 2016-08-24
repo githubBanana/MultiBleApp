@@ -25,10 +25,12 @@
         <activity android:name=".ui.HtsActivity"
             android:screenOrientation="landscape"
             android:configChanges="orientation|keyboardHidden|screenSize">
-
         </activity>
+        <activity android:name=".ui.Hts2Activity"
+            android:screenOrientation="portrait"/>
         <service android:name=".ble.service.ScanService"/>
         <service android:name="com.diy.blelib.ble.hts.HtsService"/>
+        <service android:name="com.diy.blelib.ble.hts2.HtsService2"/>
         <service android:name="com.diy.blelib.ble.ropeskip.RopeSkipService"/>
         <service android:name="com.diy.blelib.ble.sport.SportService"/>
     </application>

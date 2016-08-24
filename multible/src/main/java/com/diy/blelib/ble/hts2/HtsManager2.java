@@ -6,7 +6,7 @@
  * Licensees are granted free, non-transferable use of the information. NO WARRANTY of ANY KIND is provided.
  * This heading must NOT be removed from the file.
  ******************************************************************************/
-package com.diy.blelib.ble.hts;
+package com.diy.blelib.ble.hts2;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -21,10 +21,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-import com.diy.blelib.profile.bleutils.BleUtil;
-import com.diy.blelib.profile.bleutils.exception.BleErrorInfo;
 import com.diy.blelib.profile.BleManager;
 import com.diy.blelib.profile.bleutils.BleUUID;
+import com.diy.blelib.profile.bleutils.BleUtil;
+import com.diy.blelib.profile.bleutils.exception.BleErrorInfo;
 
 import java.util.List;
 
@@ -32,22 +32,22 @@ import java.util.List;
  * HTSManager class performs BluetoothGatt operations for connection, service discovery, enabling indication and reading characteristics. All operations required to connect to device with BLE HT
  * Service and reading health thermometer values are performed here. HTSActivity implements HTSManagerCallbacks in order to receive callbacks of BluetoothGatt operations
  */
-public class HtsManager implements BleManager<HtsManagerCallbacks> {
+public class HtsManager2 implements BleManager<HtsManagerCallbacks2> {
 	private final String TAG = "HtsManager2";
-	private HtsManagerCallbacks mCallbacks;
+	private HtsManagerCallbacks2 mCallbacks;
 	private BluetoothGatt mBluetoothGatt;
 	private Context mContext;
 
 	private BluetoothGattCharacteristic  mBatteryCharacteritsic,mHtsCharacteristic;
 
-	private static HtsManager managerInstance = null;
+	private static HtsManager2 managerInstance = null;
 
 	/**
 	 * singleton implementation of HTSManager class
 	 */
-	public static synchronized HtsManager getManager() {
+	public static synchronized HtsManager2 getManager() {
 		if (managerInstance == null) {
-			managerInstance = new HtsManager();
+			managerInstance = new HtsManager2();
 		}
 		return managerInstance;
 	}
@@ -56,7 +56,7 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 	 * callbacks for activity {HTSActivity} that implements HTSManagerCallbacks interface activity use this method to register itself for receiving callbacks
 	 */
 	@Override
-	public void setGattCallbacks(HtsManagerCallbacks callbacks) {
+	public void setGattCallbacks(HtsManagerCallbacks2 callbacks) {
 		mCallbacks = callbacks;
 	}
 
@@ -168,7 +168,7 @@ public class HtsManager implements BleManager<HtsManagerCallbacks> {
 				byte[] data = characteristic.getValue();
 				try {
 					float value = (float) BleUtil.decodeTemperature(characteristic.getValue());
-					Log.e(TAG, "hts : "+value );
+					Log.e(TAG, "hts2 : "+value );
 					mCallbacks.onBagReceived(value);
 				} catch (Exception e) {
 					e.printStackTrace();
