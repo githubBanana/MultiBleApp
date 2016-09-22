@@ -104,13 +104,18 @@ public class HtsManager2 implements BleManager<HtsManagerCallbacks2> {
 	private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
 		@Override
 		public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+			Log.e(TAG, "onConnectionStateChange: 77777 : "+status+" "+newState );
 			if (status == BluetoothGatt.GATT_SUCCESS) {
+				Log.e(TAG, "onConnectionStateChange:GATT_SUCCESS " );
 				if (newState == BluetoothProfile.STATE_CONNECTED) {
+					Log.e(TAG, "onConnectionStateChange: 11111");
 					mBluetoothGatt.discoverServices();
 					//This will send callback to HTSActivity when device get connected
 					mCallbacks.onDeviceConnected();
 				} else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 					//This will send callback to HTSActivity when device get disconnected
+					Log.e(TAG, "onConnectionStateChange: 22222");
+
 					if(mCallbacks != null);
 						mCallbacks.onDeviceDisconnected();
 				}
@@ -123,6 +128,7 @@ public class HtsManager2 implements BleManager<HtsManagerCallbacks2> {
 
 		@Override
 		public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+			Log.e(TAG, "onServicesDiscovered: 999999994" );
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				List<BluetoothGattService> services = gatt.getServices();
 				for (BluetoothGattService service : services) {
@@ -130,16 +136,22 @@ public class HtsManager2 implements BleManager<HtsManagerCallbacks2> {
 						mHtsCharacteristic = service.getCharacteristic(BleUUID.TP_MEASUREMENT_CHARACTERISTIC_UUID);
                     }
 				}
-
+				Log.e(TAG, "onServicesDiscovered: 666666666666666" );
 				if (mHtsCharacteristic != null) {
+					Log.e(TAG, "onServicesDiscovered: 888888" );
+
 					BleUtil.enableTPIndication(mBluetoothGatt,mHtsCharacteristic);
 					mCallbacks.onServicesDiscovered(false);
                 } else {
+					Log.e(TAG, "onServicesDiscovered: 4444" );
+
 					mCallbacks.onDeviceNotSupported();
 					gatt.disconnect();
 					return;
 				}
 			} else {
+				Log.e(TAG, "onServicesDiscovered: 33333" );
+
 				mCallbacks.onError(BleErrorInfo.ERROR_DISCOVERY_SERVICE, status);
 			}
 		}

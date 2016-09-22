@@ -1,4 +1,4 @@
-package com.xs.multibleapp.ui;
+package com.xs.multibleapp.ui.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -93,7 +93,7 @@ public class HtsActivity extends BleProfileServiceReadyActivity<HtsService.RSCBi
      */
     @Override
     protected UUID[] getFilterUUID() {
-        UUID[] uuids = new UUID[]{BleUUID.TP_SERVICE_UUID};
+        UUID[] uuids = new UUID[]{BleUUID.TP_SERVICE_UUID,BleUUID.BATTERY_SERVICE,BleUUID.R_TX_CHAR_UUID,BleUUID.W_RX_CHAR_UUID,BleUUID.HR_SERVICE_UUID};
         return uuids;
     }
 

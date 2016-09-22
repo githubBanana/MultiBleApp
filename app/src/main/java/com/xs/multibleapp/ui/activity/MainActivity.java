@@ -1,8 +1,7 @@
-package com.xs.multibleapp.ui;
+package com.xs.multibleapp.ui.activity;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -12,7 +11,6 @@ import android.view.View;
 import com.diy.blelib.profile.BleProfileService;
 import com.diy.blelib.scanner.ScannerFragment;
 import com.xs.multibleapp.R;
-import com.xs.multibleapp.ble.service.ScanService;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 ,ScannerFragment.OnDeviceSelectedListener{
@@ -31,9 +29,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.btn_test:
 
-                final Intent intent = new Intent(MainActivity.this,ScanService.class);
-                startService(intent);
-                bindService(intent,mSportServiceConn,0);
+/*                final Intent intent = new Intent(MainActivity.this,ScanService.class);
+                startService(intent);111
+                bindService(intent,mSportServiceConn,0);*/
 
 //                ScannerFragment.getInstance(UUID.fromString("uuid")).show(getSupportFragmentManager(),"tag");
 

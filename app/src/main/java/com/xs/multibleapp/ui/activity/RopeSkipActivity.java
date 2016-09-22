@@ -1,4 +1,4 @@
-package com.xs.multibleapp.ui;
+package com.xs.multibleapp.ui.activity;
 
 import android.os.Bundle;
 

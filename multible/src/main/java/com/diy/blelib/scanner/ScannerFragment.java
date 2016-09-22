@@ -247,10 +247,11 @@ public class ScannerFragment extends DialogFragment {
 		final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
 		final ScanSettings settings = new ScanSettings.Builder()
 				.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1000).setUseHardwareBatchingIfSupported(false).build();
-		final List<ScanFilter> filters = new ArrayList<>();
+		List<ScanFilter> filters = new ArrayList<>();
 		for (ParcelUuid parcelUuid : mUuid)
 			filters.add(new ScanFilter.Builder().setServiceUuid(parcelUuid).build());
 
+		filters = null;
 		scanner.startScan(filters, settings, scanCallback);
 
 		mIsScanning = true;

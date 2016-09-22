@@ -9,8 +9,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.PullLoaderRecyclerView;
 import com.xs.multibleapp.adapter.HomeAdapter;
 import com.xs.multibleapp.bean.GridViewItemData;
-import com.xs.multibleapp.ui.Hts2Activity;
-import com.xs.multibleapp.ui.HtsActivity;
+import com.xs.multibleapp.ui.activity.Hts2Activity;
+import com.xs.multibleapp.ui.activity.HtsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
